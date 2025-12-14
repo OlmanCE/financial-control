@@ -1,0 +1,89 @@
+/* src/styles/components.css */
+@layer components {
+  /* Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-base font-medium transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-zinc-900 text-white hover:bg-zinc-800;
+    @apply focus:ring-zinc-900;
+  }
+
+  .btn-secondary {
+    @apply bg-zinc-100 text-zinc-900 hover:bg-zinc-200;
+    @apply focus:ring-zinc-500;
+  }
+
+  .btn-outline {
+    @apply border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50;
+    @apply focus:ring-zinc-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+    @apply focus:ring-red-600;
+  }
+
+  /* Input Styles */
+  .input {
+    @apply w-full rounded-lg border border-zinc-300 px-4 py-3;
+    @apply outline-none transition-all;
+    @apply focus:border-transparent focus:ring-2 focus:ring-zinc-900;
+    @apply disabled:cursor-not-allowed disabled:bg-zinc-100;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:ring-red-500;
+  }
+
+  /* Label Styles */
+  .label {
+    @apply mb-2 block text-sm font-medium text-zinc-700;
+  }
+
+  /* Card Styles */
+  .card {
+    @apply rounded-xl bg-white p-6 shadow-md;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg;
+  }
+
+  /* Alert Styles */
+  .alert {
+    @apply rounded-lg border p-4 text-sm;
+  }
+
+  .alert-error {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .alert-success {
+    @apply border-green-200 bg-green-50 text-green-700;
+  }
+
+  .alert-warning {
+    @apply border-yellow-200 bg-yellow-50 text-yellow-700;
+  }
+
+  .alert-info {
+    @apply border-blue-200 bg-blue-50 text-blue-700;
+  }
+
+  /* Loading Spinner */
+  .spinner {
+    @apply h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent;
+  }
+
+  .spinner-sm {
+    @apply h-4 w-4;
+  }
+
+  .spinner-lg {
+    @apply h-6 w-6;
+  }
+}
