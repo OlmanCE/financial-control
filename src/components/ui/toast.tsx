@@ -1,14 +1,14 @@
 // src/components/ui/toast.tsx
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from "lucide-react";
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import { AlertCircle, CheckCircle, Info, AlertTriangle, X } from "lucide-react"
 
 export interface ToastProps {
-  variant?: "error" | "success" | "warning" | "info";
-  title: string;
-  description?: string;
-  onClose?: () => void;
-  duration?: number; // milisegundos, 0 = no auto-close
+  variant?: "error" | "success" | "warning" | "info"
+  title: string
+  description?: string
+  onClose?: () => void
+  duration?: number
 }
 
 const iconMap = {
@@ -16,75 +16,62 @@ const iconMap = {
   success: CheckCircle,
   warning: AlertTriangle,
   info: Info,
-};
+}
 
-export const Toast: React.FC<ToastProps> = ({
-  variant = "info",
-  title,
-  description,
-  onClose,
-  duration = 5000,
-}) => {
-  const Icon = iconMap[variant];
-  const [isVisible, setIsVisible] = React.useState(true);
+export const Toast: React.FC<ToastProps> = ({ variant = "info", title, description, onClose, duration = 5000 }) => {
+  const Icon = iconMap[variant]
+  const [isVisible, setIsVisible] = React.useState(true)
 
   React.useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(() => onClose?.(), 300); // Esperar a que termine la animación
-      }, duration);
+        setIsVisible(false)
+        setTimeout(() => onClose?.(), 300)
+      }, duration)
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer)
     }
-  }, [duration, onClose]);
+  }, [duration, onClose])
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
-  const variantStyles = {
-    error: "bg-red-50 border-red-200 text-red-800",
-    success: "bg-green-50 border-green-200 text-green-800",
-    warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
-    info: "bg-blue-50 border-blue-200 text-blue-800",
-  };
-
-  const iconStyles = {
-    error: "text-red-600",
-    success: "text-green-600",
-    warning: "text-yellow-600",
-    info: "text-blue-600",
-  };
+  const variantClasses = {
+    error: "alert-error",
+    success: "alert-success",
+    warning: "alert-warning",
+    info: "alert-info",
+  }
 
   return (
     <div
+      role="alert"
+      aria-live="polite"
       className={cn(
-        "fixed top-4 right-4 z-50 animate-slide-in rounded-lg border p-4 shadow-lg max-w-md",
-        variantStyles[variant],
-        !isVisible && "animate-slide-out"
+        "fixed top-4 right-4 z-50 rounded-lg shadow-xl max-w-md w-full mx-4 md:mx-0",
+        "animate-slide-in p-4 flex items-start gap-3",
+        variantClasses[variant],
+        !isVisible && "animate-slide-out",
       )}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0">
-          <Icon className={cn("w-5 h-5", iconStyles[variant])} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold">{title}</h3>
-          {description && (
-            <p className="mt-1 text-sm opacity-90">{description}</p>
-          )}
-        </div>
-        {onClose && (
-          <button
-            onClick={() => {
-              setIsVisible(false);
-              setTimeout(() => onClose(), 5000);
-            }}
-            className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
+      <div className="flex-shrink-0 mt-0.5">
+        <Icon className="w-5 h-5" aria-hidden="true" />
       </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-semibold leading-tight">{title}</h3>
+        {description && <p className="mt-1 text-sm opacity-90 leading-relaxed">{description}</p>}
+      </div>
+      {onClose && (
+        <button
+          onClick={() => {
+            setIsVisible(false)
+            setTimeout(() => onClose(), 300)
+          }}
+          className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+          aria-label="Close notification"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
-  );
-};
+  )
+}

@@ -1,77 +1,152 @@
 /* src/styles/components.css */
 @layer components {
-  /* Button Styles */
+  /* Button Styles - Mobile First con touch targets */
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-base font-medium transition-all duration-200;
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-all;
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
     @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply min-h-touch text-base;
+    /* Mobile: padding generoso para tocar fácilmente */
+    @apply px-6 py-3;
+    /* Tablet/Desktop: padding más compacto */
+    @apply md:px-5 md:py-2.5 md:text-sm;
+    transition: var(--transition-base);
   }
 
   .btn-primary {
-    @apply bg-zinc-900 text-white hover:bg-zinc-800;
-    @apply focus:ring-zinc-900;
+    @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+    @apply focus:ring-primary-600;
+    box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.05);
   }
 
   .btn-secondary {
-    @apply bg-zinc-100 text-zinc-900 hover:bg-zinc-200;
-    @apply focus:ring-zinc-500;
+    @apply bg-neutral-100 text-neutral-900 hover:bg-neutral-200 active:bg-neutral-300;
+    @apply focus:ring-neutral-500;
   }
 
   .btn-outline {
-    @apply border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50;
-    @apply focus:ring-zinc-500;
+    @apply border-2 border-neutral-300 bg-white text-neutral-900;
+    @apply hover:bg-neutral-50 active:bg-neutral-100;
+    @apply focus:ring-neutral-500;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700;
-    @apply focus:ring-red-600;
+    @apply bg-expense text-white hover:bg-expense-dark active:opacity-90;
+    @apply focus:ring-expense;
   }
 
-  /* Input Styles */
+  .btn-success {
+    @apply bg-income text-white hover:bg-income-dark active:opacity-90;
+    @apply focus:ring-income;
+  }
+
+  .btn-sm {
+    @apply min-h-[36px] px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply min-h-[52px] px-8 py-4 text-lg;
+  }
+
+  /* Input Styles - Mobile optimized */
   .input {
-    @apply w-full rounded-lg border border-zinc-300 px-4 py-3;
+    @apply w-full rounded-lg border-2 border-input bg-card;
     @apply outline-none transition-all;
-    @apply focus:border-transparent focus:ring-2 focus:ring-zinc-900;
-    @apply disabled:cursor-not-allowed disabled:bg-zinc-100;
+    @apply focus:border-ring focus:ring-2 focus:ring-ring/20;
+    @apply disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground;
+    @apply placeholder:text-muted-foreground;
+    /* Mobile: padding generoso y texto grande */
+    @apply px-4 py-3 text-base;
+    /* Desktop: más compacto */
+    @apply md:px-3 md:py-2 md:text-sm;
+    transition: var(--transition-base);
+    min-height: 44px; /* Touch target mínimo */
   }
 
   .input-error {
-    @apply border-red-500 focus:ring-red-500;
+    @apply border-expense focus:border-expense focus:ring-expense/20;
+  }
+
+  .input-success {
+    @apply border-income focus:border-income focus:ring-income/20;
   }
 
   /* Label Styles */
   .label {
-    @apply mb-2 block text-sm font-medium text-zinc-700;
+    @apply mb-2 block font-medium text-foreground;
+    /* Mobile: texto más grande */
+    @apply text-base;
+    /* Desktop: más compacto */
+    @apply md:text-sm;
   }
 
-  /* Card Styles */
+  /* Card Styles - Mobile First */
   .card {
-    @apply rounded-xl bg-white p-6 shadow-md;
+    @apply rounded-xl bg-card border border-border;
+    @apply shadow-card transition-shadow;
+    /* Mobile: padding generoso */
+    @apply p-5;
+    /* Tablet/Desktop */
+    @apply md:p-6;
   }
 
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-lg;
+    @apply hover:shadow-card-hover cursor-pointer;
+    transition: var(--transition-base);
+  }
+
+  /* Financial Card Variants */
+  .card-income {
+    @apply border-income/20 bg-income/5;
+  }
+
+  .card-expense {
+    @apply border-expense/20 bg-expense/5;
+  }
+
+  .card-savings {
+    @apply border-savings/20 bg-savings/5;
   }
 
   /* Alert Styles */
   .alert {
-    @apply rounded-lg border p-4 text-sm;
+    @apply rounded-lg border-2 p-4 text-sm;
+    /* Mobile: más espacio y texto grande */
+    @apply md:text-sm p-4;
   }
 
   .alert-error {
-    @apply border-red-200 bg-red-50 text-red-700;
+    @apply border-expense/20 bg-expense/10 text-expense-dark;
   }
 
   .alert-success {
-    @apply border-green-200 bg-green-50 text-green-700;
+    @apply border-income/20 bg-income/10 text-income-dark;
   }
 
   .alert-warning {
-    @apply border-yellow-200 bg-yellow-50 text-yellow-700;
+    @apply border-warning/20 bg-warning/10 text-warning-dark;
   }
 
   .alert-info {
-    @apply border-blue-200 bg-blue-50 text-blue-700;
+    @apply border-savings/20 bg-savings/10 text-savings-dark;
+  }
+
+  /* Badge Styles para categorías financieras */
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+    @apply md:px-2.5 md:py-0.5;
+  }
+
+  .badge-income {
+    @apply bg-income/10 text-income-dark;
+  }
+
+  .badge-expense {
+    @apply bg-expense/10 text-expense-dark;
+  }
+
+  .badge-savings {
+    @apply bg-savings/10 text-savings-dark;
   }
 
   /* Loading Spinner */
@@ -85,5 +160,38 @@
 
   .spinner-lg {
     @apply h-6 w-6;
+  }
+
+  /* Amount display - números grandes y legibles */
+  .amount {
+    @apply font-semibold tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  .amount-large {
+    @apply text-3xl md:text-4xl;
+  }
+
+  .amount-medium {
+    @apply text-xl md:text-2xl;
+  }
+
+  .amount-income {
+    @apply text-income;
+  }
+
+  .amount-expense {
+    @apply text-expense;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border my-6;
+  }
+
+  /* Container móvil */
+  .container-mobile {
+    @apply w-full px-4 mx-auto;
+    @apply md:px-6 lg:max-w-7xl;
   }
 }
