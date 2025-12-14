@@ -8,6 +8,7 @@ export const AUTH_ERRORS = {
   NETWORK_ERROR: 'Error de conexión. Verifica tu internet',
   CAPTCHA_FAILED: 'Error de verificación. Intenta nuevamente',
   UNEXPECTED_ERROR: 'Ocurrió un error inesperado',
+  ACCOUNT_DEACTIVATED: 'Tu cuenta ha sido desactivada. Por favor contacta al administrador.',
 } as const;
 
 export const AUTH_SUCCESS = {
@@ -15,6 +16,11 @@ export const AUTH_SUCCESS = {
   LOGIN: '¡Bienvenido de vuelta!',
   LOGOUT: 'Sesión cerrada correctamente',
   PASSWORD_RESET_SENT: 'Email de recuperación enviado',
+} as const;
+
+export const AUTH_MESSAGES = {
+  ACCOUNT_DEACTIVATED_TITLE: 'Cuenta Desactivada',
+  ACCOUNT_DEACTIVATED_DESCRIPTION: 'Tu cuenta ha sido desactivada. Por favor contacta al administrador.',
 } as const;
 
 export const USER_ROLES = {

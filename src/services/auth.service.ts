@@ -30,6 +30,9 @@ const handleAuthError = (error: any): never => {
   throw new Error(message);
 };
 
+// Helper para esperar un tiempo
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const authService = {
   // Sign up con email y password
   async signUp({ email, password }: SignUpData) {
@@ -96,7 +99,7 @@ export const authService = {
     return user;
   },
 
-  // Get user role
+  // Get user role - MODIFICADO PARA LANZAR ERROR SI NO EXISTE
   async getUserRole(userId: string): Promise<"admin" | "user"> {
     try {
       const { data, error } = await supabaseClient
@@ -105,16 +108,49 @@ export const authService = {
         .eq("user_id", userId)
         .single();
 
-      if (error) {
-        console.error("Error fetching user role:", error);
-        return USER_ROLES.USER;
+      // Si hay error o no hay data, el usuario no existe en user_roles
+      if (error || !data) {
+        console.error("User role not found:", error);
+        throw new Error("USER_NOT_IN_ROLES");
       }
 
-      return (data?.role as "admin" | "user") || USER_ROLES.USER;
+      return (data.role as "admin" | "user") || USER_ROLES.USER;
     } catch (error) {
-      console.error("Unexpected error fetching role:", error);
-      return USER_ROLES.USER;
+      console.error("Error fetching user role:", error);
+      throw error; // Re-lanzamos el error para que AuthProvider lo maneje
     }
+  },
+
+  // Validar que el usuario existe en user_roles CON RETRY
+  async validateUserExists(userId: string, maxRetries = 5, delayMs = 500): Promise<boolean> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const { data, error } = await supabaseClient
+          .from("user_roles")
+          .select("user_id")
+          .eq("user_id", userId)
+          .single();
+
+        if (!error && data !== null) {
+          console.log(`✅ Usuario encontrado en user_roles (intento ${attempt + 1})`);
+          return true;
+        }
+
+        // Si no es el último intento, esperar antes de reintentar
+        if (attempt < maxRetries - 1) {
+          console.log(`⏳ Usuario no encontrado, reintentando en ${delayMs}ms... (intento ${attempt + 1}/${maxRetries})`);
+          await sleep(delayMs);
+        }
+      } catch (error) {
+        console.error(`Error en intento ${attempt + 1}:`, error);
+        if (attempt < maxRetries - 1) {
+          await sleep(delayMs);
+        }
+      }
+    }
+
+    console.warn(`❌ Usuario no encontrado después de ${maxRetries} intentos`);
+    return false;
   },
 
   // Reset password
