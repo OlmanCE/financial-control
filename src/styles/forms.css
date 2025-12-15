@@ -1,0 +1,308 @@
+/* src/styles/forms.css */
+@layer components {
+  /* ============================================================================
+     FINANCIAL FORMS - Estilos específicos para formularios financieros
+     ============================================================================ */
+
+  /* Form Container con gradiente sutil y claro */
+  .financial-form-card {
+    @apply card relative overflow-hidden;
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f0fdf4 50%,
+      #dcfce7 100%
+    );
+    border: 1px solid #d1fae5;
+  }
+
+  .financial-form-card-expense {
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #fef2f2 50%,
+      #fee2e2 100%
+    );
+    border: 1px solid #fecaca;
+  }
+
+  /* Amount Input - Destacado con color financiero claro */
+  .amount-input-wrapper {
+    @apply relative;
+  }
+
+  .amount-input-income {
+    @apply input;
+    border: 2px solid #6ee7b7;
+    background: #f0fdf4;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .amount-input-income:focus {
+    border-color: #10b981;
+    background: #ecfdf5;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+
+  .amount-input-income::placeholder {
+    color: #9ca3af;
+  }
+
+  .amount-input-expense {
+    @apply input;
+    border: 2px solid #fca5a5;
+    background: #fef2f2;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .amount-input-expense:focus {
+    border-color: #ef4444;
+    background: #fee2e2;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+  }
+
+  .amount-input-expense::placeholder {
+    color: #9ca3af;
+  }
+
+  /* Currency Symbol con color */
+  .currency-symbol-income {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 font-bold text-lg pointer-events-none;
+    color: rgb(16, 185, 129);
+  }
+
+  .currency-symbol-expense {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 font-bold text-lg pointer-events-none;
+    color: rgb(239, 68, 68);
+  }
+
+  /* Combobox Dropdown con fondo claro y legible */
+  .combobox-dropdown {
+    @apply absolute z-50 w-full mt-2 rounded-lg flex flex-col;
+    background: #ffffff;
+    border: 2px solid #10b981;
+    box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.2),
+      0 10px 10px -5px rgba(16, 185, 129, 0.15),
+      0 0 0 1px rgba(16, 185, 129, 0.1);
+    max-height: 320px;
+    animation: dropdown-slide-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes dropdown-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Combobox con backdrop blur para mejor legibilidad */
+  .combobox-backdrop {
+    @apply fixed inset-0 z-40;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    animation: backdrop-fade-in 0.2s ease-out;
+  }
+
+  @keyframes backdrop-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Search Input dentro del dropdown */
+  .combobox-search-input {
+    @apply w-full pl-10 pr-3 py-2.5 text-sm border-0 rounded-md;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/30;
+    background: #f9fafb;
+    color: #1f2937;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .combobox-search-input::placeholder {
+    color: #6b7280;
+  }
+
+  /* Options con hover suave */
+  .combobox-option {
+    @apply flex items-center justify-between px-4 py-3 cursor-pointer transition-all duration-150;
+    @apply min-h-touch;
+    color: #1f2937;
+    background: transparent;
+    font-size: 15px;
+  }
+
+  .combobox-option:hover {
+    background: #f0fdf4;
+    border-left: 3px solid #86efac;
+  }
+
+  .combobox-option:active {
+    background: #dcfce7;
+  }
+
+  .combobox-option-selected {
+    background: #d1fae5;
+    font-weight: 600;
+    color: #047857;
+    border-left: 3px solid #10b981;
+  }
+
+  /* Empty message */
+  .combobox-empty-message {
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  /* Create New Button con estilo destacado */
+  .combobox-create-btn {
+    @apply w-full flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-md;
+    @apply transition-all duration-200 min-h-touch;
+    background: #ffffff;
+    color: #047857;
+    border: 2px dashed #6ee7b7;
+    font-size: 15px;
+  }
+
+  .combobox-create-btn:hover {
+    background: #f0fdf4;
+    border-color: #34d399;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);
+  }
+
+  .combobox-create-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Form Section Headers */
+  .form-section-divider {
+    @apply flex items-center gap-3 my-6;
+  }
+
+  .form-section-divider::before,
+  .form-section-divider::after {
+    content: '';
+    @apply flex-1 border-t border-border;
+  }
+
+  .form-section-title {
+    @apply text-xs font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  /* Submit Button con gradiente financiero */
+  .submit-btn-income {
+    @apply btn w-full font-semibold text-white;
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+    border: none;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .submit-btn-income:hover:not(:disabled) {
+    background: linear-gradient(135deg, #047857 0%, #059669 50%, #10b981 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .submit-btn-income:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  .submit-btn-expense {
+    @apply btn w-full font-semibold text-white;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
+    border: none;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .submit-btn-expense:hover:not(:disabled) {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .submit-btn-expense:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  }
+
+  /* Textarea con estilo mejorado */
+  .form-textarea {
+    @apply input resize-none;
+    min-height: 100px;
+    background: #f9fafb;
+    color: #1f2937;
+    font-size: 15px;
+    transition: all 0.2s ease;
+  }
+
+  .form-textarea:focus {
+    min-height: 120px;
+    background: #ffffff;
+  }
+
+  .form-textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  /* Helper Text con icono */
+  .form-helper-text {
+    @apply flex items-start gap-2 mt-2 text-xs;
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .form-helper-icon {
+    @apply w-4 h-4 flex-shrink-0 mt-0.5;
+    color: #10b981;
+  }
+
+  /* Loading State para inputs */
+  .input-loading {
+    @apply relative;
+  }
+
+  .input-loading::after {
+    content: '';
+    @apply absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-top-color: rgb(16, 185, 129);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  /* Field Focus Ring con color primario */
+  .field-focus-ring:focus-within {
+    @apply ring-2 ring-primary/20 ring-offset-2 ring-offset-background;
+  }
+
+  /* Success State */
+  .field-success {
+    @apply border-income;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+
+  /* Optional Badge */
+  .optional-badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs rounded-full;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}

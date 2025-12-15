@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowDownCircle } from "lucide-react";
 import { ROUTES } from "@/lib/constants/routes";
 import AppHeader from "@/components/header/AppHeader";
-import { Button } from "@/components/ui/button";
+import MovementForm from "@/components/forms/MovementForm";
 
 export default function UserExpenseForm() {
   const navigate = useNavigate();
@@ -36,42 +36,8 @@ export default function UserExpenseForm() {
           </p>
         </div>
 
-        {/* Card del formulario */}
-        <div className="card max-w-2xl mx-auto">
-          <div className="text-center py-12">
-            <div className="w-16 h-16 rounded-full bg-expense/10 flex items-center justify-center mx-auto mb-4">
-              <ArrowDownCircle className="w-8 h-8 text-expense" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              Formulario de Egreso
-            </h3>
-            <p className="text-muted-foreground text-sm mb-6">
-              El formulario se implementará próximamente
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => navigate(ROUTES.USER_ENTRY)}
-            >
-              Regresar a selección
-            </Button>
-          </div>
-        </div>
-
-        {/* 
-          TODO: Implementar formulario con los siguientes campos:
-          - Monto (amount): numeric, requerido
-          - Categoría (category_id): select de categories WHERE type IN ('expense', 'both')
-          - Fuente (source_id): select de sources WHERE type IN ('expense', 'both')
-          - Proyecto (project_id): select opcional de projects WHERE active = true
-          - Descripción (description): textarea opcional
-          
-          El formulario debe:
-          1. Validar que el monto sea mayor a 0
-          2. Cargar categorías y fuentes desde Supabase
-          3. Enviar datos con type = 'expense' y created_by = user.id
-          4. Mostrar feedback de éxito/error
-          5. Redirigir a una vista de confirmación o listado
-        */}
+        {/* Formulario de egreso */}
+        <MovementForm type="expense" />
       </div>
     </div>
   );
