@@ -134,15 +134,13 @@ export const categoriesService = {
       .from('categories')
       .select('*')
       .ilike('name', name)
-      .limit(1)
-      .single();
+      .limit(1);
 
     if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned
       console.error('Error finding category:', error);
     }
 
-    return data || null;
+    return data && data.length > 0 ? data[0] : null; // ✅ Retornar primer elemento o null
   },
 };
 
@@ -214,14 +212,13 @@ export const sourcesService = {
       .from('sources')
       .select('*')
       .ilike('name', name)
-      .limit(1)
-      .single();
+      .limit(1); // ✅ CAMBIAR .single() por .limit(1)
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error finding source:', error);
     }
 
-    return data || null;
+    return data && data.length > 0 ? data[0] : null; // ✅ Retornar primer elemento o null
   },
 };
 
@@ -292,14 +289,13 @@ export const projectsService = {
       .from('projects')
       .select('*')
       .ilike('name', name)
-      .limit(1)
-      .single();
+      .limit(1); // ✅ CAMBIAR .single() por .limit(1)
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error finding project:', error);
     }
 
-    return data || null;
+    return data && data.length > 0 ? data[0] : null; // ✅ Retornar primer elemento o null
   },
 };
 
@@ -361,4 +357,24 @@ export const movementsService = {
 
     return data;
   },
+
+  /**
+   * Actualiza un movimiento existente (para agregar proyecto después)
+   */
+  async update(movementId: string, updates: Partial<CreateMovementData>): Promise<Movement> {
+    const { data, error } = await supabaseClient
+      .from('movements')
+      .update(updates)
+      .eq('id', movementId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating movement:', error);
+      throw new Error('Error al actualizar el movimiento');
+    }
+
+    return data;
+  },
+
 };

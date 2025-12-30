@@ -1,14 +1,15 @@
 // src/auth/AuthProvider.tsx
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useRef } from "react";
 import { supabaseClient } from "@/lib/supabaseClient";
 import type { User } from "@supabase/supabase-js";
-import { authService } from "@/services/auth.service";
+import { authService, type UserProfile } from "@/services/auth.service";
 import { Toast } from "@/components/ui/toast";
 import { AUTH_MESSAGES } from "@/lib/constants/auth";
 
 interface AuthContextType {
   user: User | null;
   role: "admin" | "user" | null;
+  displayName: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -20,8 +21,12 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<"admin" | "user" | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeactivatedAlert, setShowDeactivatedAlert] = useState(false);
+  
+  // 🆕 NUEVO: Ref para evitar race conditions
+  const isInitializing = useRef(false);
 
   // Función para limpiar la sesión con delay para mostrar el toast
   const clearSession = async (showToast = false) => {
@@ -34,50 +39,83 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await supabaseClient.auth.signOut();
     setUser(null);
     setRole(null);
+    setDisplayName(null);
     setShowDeactivatedAlert(false);
   };
 
+  // Helper para cargar el perfil del usuario
+  const loadUserProfile = async (sessionUser: User): Promise<UserProfile | null> => {
+    try {
+      // Validar que el usuario existe en user_roles CON RETRY
+      const userExists = await authService.validateUserExists(sessionUser.id);
+      
+      if (!userExists) {
+        console.warn("Usuario no existe en user_roles después de reintentos");
+        return null;
+      }
+
+      // Obtener perfil completo (role + display_name)
+      const profile = await authService.getUserProfile(sessionUser.id, sessionUser.email || "");
+      return profile;
+    } catch (error) {
+      console.error("Error cargando perfil:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
+    // 🆕 NUEVO: Prevenir inicializaciones múltiples
+    if (isInitializing.current) {
+      console.log("⏸️ Auth ya está inicializando, saltando...");
+      return;
+    }
+
     // Check active sessions and sets the user
     const initializeAuth = async () => {
+      isInitializing.current = true;
+      
       try {
-        const {
-          data: { session },
-        } = await supabaseClient.auth.getSession();
+        // 🆕 NUEVO: Timeout de seguridad para la inicialización
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Auth initialization timeout")), 15000);
+        });
 
-        if (session?.user) {
-          // Validar que el usuario existe en user_roles CON RETRY
-          // Esto espera hasta 2.5 segundos (5 intentos x 500ms) para que el trigger complete
-          const userExists = await authService.validateUserExists(session.user.id);
-          
-          if (!userExists) {
-            // Usuario no existe en la BD - mostrar alerta y cerrar sesión
-            console.warn("Usuario no existe en user_roles después de reintentos, cerrando sesión...");
-            await clearSession(true); // Mostrar toast y esperar
-            setLoading(false);
-            return;
-          }
+        const authPromise = (async () => {
+          const {
+            data: { session },
+          } = await supabaseClient.auth.getSession();
 
-          try {
-            const userRole = await authService.getUserRole(session.user.id);
+          if (session?.user) {
+            const profile = await loadUserProfile(session.user);
+            
+            if (!profile) {
+              await clearSession(true);
+              return;
+            }
+
             setUser(session.user);
-            setRole(userRole);
-            // IMPORTANTE: Resetear el estado del toast si el usuario es válido
+            setRole(profile.role);
+            setDisplayName(profile.displayName);
             setShowDeactivatedAlert(false);
-          } catch (error) {
-            // Si falla getUserRole, significa que el usuario no existe
-            console.error("Error obteniendo rol:", error);
-            await clearSession(true); // Mostrar toast y esperar
+          } else {
+            setShowDeactivatedAlert(false);
           }
-        } else {
-          // No hay sesión, asegurar que el toast no se muestre
-          setShowDeactivatedAlert(false);
-        }
+        })();
+
+        // Race entre la autenticación y el timeout
+        await Promise.race([authPromise, timeoutPromise]);
+        
       } catch (error) {
         console.error("Error initializing auth:", error);
         setShowDeactivatedAlert(false);
+        
+        // Si hay timeout, forzar loading a false
+        if (error instanceof Error && error.message.includes("timeout")) {
+          console.error("⚠️ Auth timeout - forzando salida del loading state");
+        }
       } finally {
         setLoading(false);
+        isInitializing.current = false;
       }
     };
 
@@ -86,48 +124,71 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for changes on auth state (sign in, sign out, etc.)
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        // Validar que el usuario existe CON RETRY
-        const userExists = await authService.validateUserExists(session.user.id);
-        
-        if (!userExists) {
-          await clearSession(true); // Mostrar toast y esperar
-          setLoading(false);
-          return;
-        }
+    } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log("🔐 Auth state change:", event);
+      
+      // 🆕 NUEVO: Manejar evento de signed out explícitamente
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setRole(null);
+        setDisplayName(null);
+        setShowDeactivatedAlert(false);
+        setLoading(false);
+        return;
+      }
 
+      // 🆕 NUEVO: Agregar timeout también aquí
+      if (session?.user) {
         try {
-          const userRole = await authService.getUserRole(session.user.id);
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error("Profile load timeout")), 10000);
+          });
+
+          const profilePromise = loadUserProfile(session.user);
+          const profile = await Promise.race([profilePromise, timeoutPromise]) as UserProfile | null;
+          
+          if (!profile) {
+            await clearSession(true);
+            setLoading(false);
+            return;
+          }
+
           setUser(session.user);
-          setRole(userRole);
-          // Resetear el toast cuando hay sesión válida
+          setRole(profile.role);
+          setDisplayName(profile.displayName);
           setShowDeactivatedAlert(false);
         } catch (error) {
-          console.error("Error obteniendo rol en auth state change:", error);
-          await clearSession(true); // Mostrar toast y esperar
+          console.error("Error en auth state change:", error);
+          setUser(null);
+          setRole(null);
+          setDisplayName(null);
         }
       } else {
         setUser(null);
         setRole(null);
-        // Resetear el toast cuando no hay sesión
+        setDisplayName(null);
         setShowDeactivatedAlert(false);
       }
+      
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      isInitializing.current = false;
+    };
   }, []);
 
   const signOut = async () => {
     await authService.signOut();
     setUser(null);
     setRole(null);
+    setDisplayName(null);
     setShowDeactivatedAlert(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, signOut }}>
+    <AuthContext.Provider value={{ user, role, displayName, loading, signOut }}>
       {/* Toast de cuenta desactivada */}
       {showDeactivatedAlert && (
         <Toast

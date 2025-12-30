@@ -32,6 +32,30 @@ export default function LoginPage() {
     }
   }, [user, role, navigate]);
 
+  // 🆕 NUEVO: Cleanup del loading state cuando el componente vuelve a ser visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Resetear loading cuando la página vuelve a ser visible
+        // (por ejemplo, al cancelar OAuth y volver)
+        setLoading(false);
+      }
+    };
+
+    const handleFocus = () => {
+      // También resetear cuando la ventana recupera el foco
+      setLoading(false);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -71,13 +95,26 @@ export default function LoginPage() {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
+      setError("");
+      
+      // 🆕 NUEVO: Timeout de seguridad por si OAuth falla silenciosamente
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        console.log("OAuth timeout - resetear loading state");
+      }, 3000); // 3 segundos de gracia antes de resetear
+
       await authService.signInWithGoogle();
+      
+      // Si llegamos aquí sin error, limpiar el timeout
+      clearTimeout(timeoutId);
+      // El loading se mantendrá hasta que se complete la redirección
     } catch (err: any) {
       setError(err.message);
       setLoading(false);
     }
   };
-return (
+
+  return (
     <div className="flex min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary-dark to-primary-darker p-12 flex-col justify-between relative overflow-hidden">
         {/* Decorative background elements */}

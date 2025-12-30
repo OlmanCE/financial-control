@@ -13,6 +13,20 @@ export interface SignInData {
   password: string;
 }
 
+export interface UserRole {
+  user_id: string;
+  role: "admin" | "user";
+  display_name: string | null;
+  created_at: string;
+}
+
+export interface UserProfile {
+  userId: string;
+  email: string;
+  role: "admin" | "user";
+  displayName: string;
+}
+
 // Helper para manejar errores de Supabase
 const handleAuthError = (error: any): never => {
   console.error("Auth error:", error);
@@ -32,6 +46,13 @@ const handleAuthError = (error: any): never => {
 
 // Helper para esperar un tiempo
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Helper para extraer nombre del email
+const extractNameFromEmail = (email: string): string => {
+  const username = email.split('@')[0];
+  // Capitalizar la primera letra
+  return username.charAt(0).toUpperCase() + username.slice(1);
+};
 
 export const authService = {
   // Sign up con email y password
@@ -118,6 +139,35 @@ export const authService = {
     } catch (error) {
       console.error("Error fetching user role:", error);
       throw error; // Re-lanzamos el error para que AuthProvider lo maneje
+    }
+  },
+
+  // NUEVO: Obtener perfil completo del usuario (role + display_name)
+  async getUserProfile(userId: string, userEmail: string): Promise<UserProfile> {
+    try {
+      const { data, error } = await supabaseClient
+        .from("user_roles")
+        .select("role, display_name")
+        .eq("user_id", userId)
+        .single();
+
+      if (error || !data) {
+        console.error("User profile not found:", error);
+        throw new Error("USER_NOT_IN_ROLES");
+      }
+
+      // Si display_name es null, extraer del email como fallback
+      const displayName = data.display_name || extractNameFromEmail(userEmail);
+
+      return {
+        userId,
+        email: userEmail,
+        role: (data.role as "admin" | "user") || USER_ROLES.USER,
+        displayName,
+      };
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      throw error;
     }
   },
 

@@ -18,8 +18,13 @@
   /* Mobile: parte superior centrada */
   @media (max-width: 640px) {
     .toast-container {
-      top: 16px;
-      width: calc(100vw - 32px);
+      top: auto;
+      bottom: 24px;
+      /* Cambiado a bottom */
+      left: 16px;
+      right: 16px;
+      transform: none;
+      width: auto;
       max-width: none;
     }
   }
@@ -32,46 +37,46 @@
     min-height: 72px;
   }
 
+
+  /* Mobile: slide from bottom */
+  @media (max-width: 640px) {
+    .toast-base {
+      animation: toast-slide-up-mobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
   /* Toast Success - Financial Green */
   .toast-success {
-    background: linear-gradient(
-      135deg,
-      rgba(16, 185, 129, 0.95) 0%,
-      rgba(5, 150, 105, 0.95) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(16, 185, 129, 0.95) 0%,
+        rgba(5, 150, 105, 0.95) 100%);
     border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
 
   /* Toast Error - Financial Red */
   .toast-error {
-    background: linear-gradient(
-      135deg,
-      rgba(239, 68, 68, 0.95) 0%,
-      rgba(220, 38, 38, 0.95) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(239, 68, 68, 0.95) 0%,
+        rgba(220, 38, 38, 0.95) 100%);
     border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
 
   /* Toast Warning */
   .toast-warning {
-    background: linear-gradient(
-      135deg,
-      rgba(245, 158, 11, 0.95) 0%,
-      rgba(217, 119, 6, 0.95) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(245, 158, 11, 0.95) 0%,
+        rgba(217, 119, 6, 0.95) 100%);
     border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
 
   /* Toast Info */
   .toast-info {
-    background: linear-gradient(
-      135deg,
-      rgba(59, 130, 246, 0.95) 0%,
-      rgba(37, 99, 235, 0.95) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(59, 130, 246, 0.95) 0%,
+        rgba(37, 99, 235, 0.95) 100%);
     border-color: rgba(255, 255, 255, 0.3);
     color: white;
   }
@@ -124,6 +129,7 @@
       opacity: 0;
       transform: translateY(-100%) scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
@@ -135,6 +141,7 @@
       opacity: 1;
       transform: translateY(0) scale(1);
     }
+
     to {
       opacity: 0;
       transform: translateY(-20px) scale(0.95);
@@ -156,8 +163,41 @@
     from {
       width: 100%;
     }
+
     to {
       width: 0%;
+    }
+  }
+
+  /* Mobile Animation */
+  @keyframes toast-slide-up-mobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%) scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Exit animation para mobile */
+  @media (max-width: 640px) {
+    .toast-exit {
+      animation: toast-slide-down-mobile 0.3s cubic-bezier(0.4, 0, 1, 1);
+    }
+  }
+
+  @keyframes toast-slide-down-mobile {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateY(100%) scale(0.95);
     }
   }
 }
